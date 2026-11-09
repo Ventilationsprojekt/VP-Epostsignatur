@@ -47,6 +47,7 @@ details .stack{display:flex;flex-direction:column;gap:12px}
 .warn{background:var(--warn-bg);color:var(--warn-fg);border-radius:4px;padding:8px 10px;font-size:13px}
 .out{display:flex;flex-direction:column;gap:12px;min-width:0}
 .sheet{background:var(--sheet);border:1px solid var(--sheet-edge);border-radius:6px;padding:28px 24px;overflow-x:auto;box-shadow:0 1px 0 rgba(0,0,0,.03)}
+#sig td[style*="inline-block"]{display:table-cell!important}
 .mailhead{font-family:Arial,sans-serif;font-size:12px;color:#8a8f93;border-bottom:1px solid #eceeef;padding-bottom:10px;margin-bottom:18px}
 .actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 button{font:inherit;font-weight:600;font-size:15px;border-radius:4px;padding:10px 16px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--fg)}
@@ -96,7 +97,7 @@ button.primary{background:var(--red);border-color:var(--red);color:var(--red-ink
     </form>
 
     <section class="out">
-      <h2>Så här ser den ut</h2>
+      <h2>Datorsignatur – två kolumner</h2>
       <div class="sheet">
         <div class="mailhead">Till: kund@exempel.se &nbsp;·&nbsp; Ämne: Offert</div>
         <div id="sig"></div>
@@ -107,7 +108,7 @@ button.primary{background:var(--red);border-color:var(--red);color:var(--red-ink
         <span class="status" id="status" role="status"></span>
       </div>
       <div class="steps">
-        <strong>Lägg in i Outlook</strong>
+        <strong>Lägg in i Outlook på datorn</strong>
         <ol>
           <li>Klicka <b>Kopiera signatur</b>.</li>
           <li>Nya Outlook och Outlook på webben: Inställningar → Konto → Signaturer. Klassiska Outlook: Arkiv → Alternativ → E-post → Signaturer.</li>
@@ -117,7 +118,7 @@ button.primary{background:var(--red);border-color:var(--red);color:var(--red-ink
         <p>Loggan har genomskinlig bakgrund och fungerar både i ljust och mörkt läge.</p>
       </div>
 
-      <h2 style="margin-top:12px">Mobilsignatur för Outlook-appen</h2>
+      <h2 style="margin-top:12px">Mobilsignatur – en kolumn, för Outlook-appen</h2>
       <div class="sheet">
         <div class="mailhead">Skickat från mobilen</div>
         <div id="msig"></div>
