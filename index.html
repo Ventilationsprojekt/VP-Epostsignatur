@@ -116,6 +116,25 @@ button.primary{background:var(--red);border-color:var(--red);color:var(--red-ink
         </ol>
         <p>Loggan har genomskinlig bakgrund och fungerar både i ljust och mörkt läge.</p>
       </div>
+
+      <h2 style="margin-top:12px">Mobilsignatur för Outlook-appen</h2>
+      <div class="sheet">
+        <div class="mailhead">Skickat från mobilen</div>
+        <div id="msig"></div>
+      </div>
+      <div class="actions">
+        <button type="button" class="primary" id="mcopy">Kopiera mobilsignatur</button>
+        <span class="status" id="mstatus" role="status"></span>
+      </div>
+      <div class="steps">
+        <strong>Lägg in i Outlook på iPhone eller Android</strong>
+        <ol>
+          <li>Öppna den här sidan i mobilen, fyll i dina uppgifter och tryck <b>Kopiera mobilsignatur</b>.</li>
+          <li>I Outlook-appen: tryck på din profilbild → kugghjulet (Inställningar) → Signatur.</li>
+          <li>Ta bort det som står där, håll inne i rutan och välj Klistra in.</li>
+        </ol>
+        <p>Appen har en egen signatur som är skild från datorns, så den läggs in separat. Mobilversionen ligger i en kolumn så att den får plats på skärmen. I signaturinställningarna kan appen visa tabellramar, de syns inte i mailen du skickar.</p>
+      </div>
     </section>
   </div>
 </div>
@@ -194,8 +213,68 @@ function build(){
 function render(){
   if (!epostTouched) { const s = slug($("namn").value); $("epost").value = s ? s + "@ventilationsprojekt.se" : ""; }
   $("sig").innerHTML = build();
+  $("msig").innerHTML = buildMobile();
 }
 function say(msg){ $("status").textContent = msg; }
+function mlines(){
+  const k = KONTOR.find(x => x.id === $("kontor").value);
+  const L = [];
+  L.push({t:"Vänlig hälsning,"}); L.push({t:""});
+  L.push({t:($("namn").value.trim() || "Förnamn Efternamn"), b:true});
+  if ($("titel").value.trim()) L.push({t:$("titel").value.trim()});
+  L.push({t:"Ventilationsprojekt i Sverige AB | " + k.ort});
+  if ($("mobil").value.trim()) L.push({t:"Mobil " + $("mobil").value.trim()});
+  if ($("vx").value.trim()) L.push({t:"Växel " + $("vx").value.trim()});
+  if ($("epost").value.trim()) L.push({t:"E-post " + $("epost").value.trim()});
+  if ($("adr1").value.trim()) L.push({t:($("adr2").value.trim() ? "Besök " : "Adress ") + $("adr1").value.trim()});
+  if ($("adr2").value.trim()) L.push({t:"Post " + $("adr2").value.trim()});
+  L.push({t:"www.ventilationsprojekt.se"});
+  L.push({t:"Org.nr 556648-1684 · Säte: Norrköping"});
+  return L;
+}
+const LOGO_URL = "https://robinfranzen1.github.io/VP-Epostsignatur/logo.png";
+function buildMobile(){
+  // En kolumn och hostad logga: Outlook-appen klarar varken två kolumner eller inbäddade bilder.
+  const k = KONTOR.find(x => x.id === $("kontor").value);
+  const namn = $("namn").value.trim() || "Förnamn Efternamn";
+  const titel = $("titel").value.trim(), mobil = $("mobil").value.trim(), epost = $("epost").value.trim();
+  const vx = $("vx").value.trim(), a1 = $("adr1").value.trim(), a2 = $("adr2").value.trim();
+  const r = (lbl,val) => `<tr><td style="${F}font-size:13px;line-height:19px;color:#6B6B6B;font-weight:bold;padding:0 10px 0 0;vertical-align:top;white-space:nowrap;">${lbl}</td><td style="${F}font-size:13px;line-height:19px;color:#222222;padding:0;vertical-align:top;">${val}</td></tr>`;
+  let rows = "";
+  if (mobil) rows += r("Mobil", esc(mobil));
+  if (vx) rows += r("Växel", esc(vx));
+  if (epost) rows += r("E-post", `<a href="mailto:${esc(epost)}" style="color:#222222;text-decoration:none;">${esc(epost)}</a>`);
+  if (a1) rows += r(a2 ? "Besök" : "Adress", esc(a1));
+  if (a2) rows += r("Post", esc(a2));
+  return `<div style="${F}font-size:13px;color:#222222;">`+
+`<p style="${F}font-size:13px;color:#222222;margin:0 0 14px 0;">Vänlig hälsning,</p>`+
+`<p style="${F}font-size:16px;line-height:20px;font-weight:bold;color:#222222;margin:0;">${esc(namn)}</p>`+
+(titel ? `<p style="${F}font-size:13px;line-height:18px;color:#6B6B6B;margin:2px 0 0 0;">${esc(titel)}</p>` : "")+
+`<p style="${F}font-size:13px;line-height:18px;font-weight:bold;color:#222222;margin:12px 0 5px 0;">Ventilationsprojekt i Sverige AB <span style="color:#B2071B;">|</span> ${esc(k.ort)}</p>`+
+`<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;border:none;">${rows}</table>`+
+`<p style="margin:14px 0 0 0;"><a href="https://www.ventilationsprojekt.se" style="text-decoration:none;border:none;"><img src="${LOGO_URL}" width="180" height="87" alt="Ventilationsprojekt" style="display:block;border:0;width:180px;height:87px;"></a></p>`+
+`<p style="${F}font-size:11px;line-height:15px;color:#999999;margin:10px 0 0 0;"><a href="https://www.ventilationsprojekt.se" style="color:#999999;text-decoration:none;">www.ventilationsprojekt.se</a><br>Org.nr 556648-1684 &nbsp;·&nbsp; Säte: Norrköping</p>`+
+`</div>`;
+}
+function plainMobile(){ return mlines().map(l => l.t).join("\n"); }
+async function copyMobile(){
+  const html = buildMobile(), plain = plainMobile();
+  const ok = m => { $("mstatus").textContent = m; };
+  try {
+    if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+      await navigator.clipboard.write([new ClipboardItem({"text/html": new Blob([html],{type:"text/html"}), "text/plain": new Blob([plain],{type:"text/plain"})})]);
+      ok("Kopierad. Klistra in under Signatur i Outlook-appen."); return;
+    }
+    await navigator.clipboard.writeText(plain); ok("Kopierad. Klistra in under Signatur i Outlook-appen.");
+  } catch (e) {
+    try {
+      const node=$("msig"), sel=window.getSelection(), r=document.createRange();
+      r.selectNodeContents(node); sel.removeAllRanges(); sel.addRange(r);
+      const done=document.execCommand("copy"); sel.removeAllRanges();
+      ok(done ? "Kopierad. Klistra in under Signatur i Outlook-appen." : "Kunde inte kopiera. Markera texten och kopiera.");
+    } catch (e2) { ok("Kunde inte kopiera. Markera texten och kopiera."); }
+  }
+}
 
 async function copyRich(){
   const html = build();
@@ -232,6 +311,7 @@ $("epost").addEventListener("input", () => { epostTouched = $("epost").value.tri
 $("f").addEventListener("submit", e => e.preventDefault());
 $("copy").addEventListener("click", copyRich);
 $("copyHtml").addEventListener("click", copyHtml);
+$("mcopy").addEventListener("click", copyMobile);
 loadKontor(); render();
 </script>
 
